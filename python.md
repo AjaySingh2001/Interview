@@ -816,6 +816,101 @@ Copying creates a new object from an existing object. In Python, you can do shal
     del b
     gc.collect()  # Garbage collector cleans up the cycle
 
+
+# Exception Handling
+
+- An exception is an error that occurs during program execution (runtime).
+- Exception handling lets you gracefully handle errors without crashing your program.
+
+    Example: 
+    ```python
+        try:
+            num = int(input("Enter a number: "))
+            print(10 / num)
+        except ValueError:
+            print("Invalid number.")
+        except ZeroDivisionError:
+            print("Cannot divide by zero.")
+        except Exception as e:
+            print("Unknown error:", e)
+
+## Exception handling uses 4 main blocks
+
+| Block     | Purpose       | Runs When            |
+| --------- | ------------- | -------------------- |
+| `try`     | Code to test  | Always               |
+| `except`  | Handle errors | When an error occurs |
+| `else`    | Success code  | When no error        |
+| `finally` | Cleanup code  | Always               |
+
+- Example:
+    ```python
+        try:
+            x = int(input("Enter number: "))
+        except ValueError:
+            print("Invalid number")
+        else:
+            print("You entered:", x)
+        finally:
+            print("End of program")
+
+---------
+
+# Custom Exceptions
+
+- Custom exceptions are user-defined error classes that allow you to handle specific scenarios not covered by built-in exceptions.
+
+## Why Use Custom Exceptions?
+
+- To represent business logic errors clearly
+- To provide meaningful error messages
+- To separate application-specific exceptions from system ones
+
+### How to Create a Custom Exception
+
+- You define a class that inherits from Python’s built-in **Exception** class.
+
+### Custom Exception Example: Bank Withdrawal
+
+- You’re building a bank system. If a user tries to withdraw more than their balance, instead of raising a generic **ValueError**, you raise a custom **InsufficientFundsError**.
+
+    ```python
+    class InsufficientFundsError(Exception):
+        """Raised when withdrawal amount exceeds balance"""
+        def __init__(self, balance, amount):
+            self.balance = balance
+            self.amount = amount
+            self.message = f"Cannot withdraw {amount}. Available balance: {balance}"
+            super().__init__(self.message)
+
+
+    class BankAccount:
+        def __init__(self, owner, balance=0):
+            self.owner = owner
+            self.balance = balance
+
+        def deposit(self, amount):
+            self.balance += amount
+            return self.balance
+
+        def withdraw(self, amount):
+            if amount > self.balance:
+                raise InsufficientFundsError(self.balance, amount)
+            self.balance -= amount
+            return self.balance
+
+
+    # -------------------------
+    # ✅ Usage
+    try:
+        account = BankAccount("Ajay", 1000)
+        account.withdraw(1500)
+    except InsufficientFundsError as e:
+        print("Transaction Failed:", e)
+    ```
+
+-------------
+
 # Coding questions.
 
 1. Compress a string (e.g., "aaabbc" → "a3b2c1")
