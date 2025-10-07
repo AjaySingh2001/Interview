@@ -774,6 +774,7 @@ Copying creates a new object from an existing object. In Python, you can do shal
     ]
     print(reduce(lambda a, b: a + b, l))
     ```
+----
 
 # Memory Management in Python
 
@@ -816,6 +817,7 @@ Copying creates a new object from an existing object. In Python, you can do shal
     del b
     gc.collect()  # Garbage collector cleans up the cycle
 
+-----
 
 # Exception Handling
 
@@ -908,6 +910,138 @@ Copying creates a new object from an existing object. In Python, you can do shal
     except InsufficientFundsError as e:
         print("Transaction Failed:", e)
     ```
+
+-------------
+
+# Threading in Python
+
+## What is Threading?
+
+- Threading allows you to run multiple parts of a program (threads) concurrently — useful when your program performs I/O-bound tasks (like network calls, file reading, etc).
+- A thread is a lightweight unit of a process.
+
+### Why Use Threading?
+
+- To speed up I/O-bound operations
+- To perform multiple tasks simultaneously
+- To keep your program responsive
+
+- Example: 
+
+    ```python
+    import time
+    import threading
+
+    def task1():
+        for i in range(3):
+            print("Task 1 running...")
+            time.sleep(1)
+
+    def task2():
+        for i in range(3):
+            print("Task 2 running...")
+            time.sleep(1)
+
+    t1 = threading.Thread(target=task1)
+    t2 = threading.Thread(target=task2)
+
+    t1.start()
+    t2.start()
+
+    t1.join()
+    t2.join()
+
+    print("All done!")
+
+## Factors influencing thread execution
+
+1. Operating System Scheduler
+
+    - Once you call t1.start(), the OS thread scheduler decides which thread runs first.
+    - The scheduler considers:
+        - CPU core availability
+        - Thread priority (all Python threads have equal priority by default)
+        - Current system load
+        - Fairness algorithms (e.g., Round Robin, Priority Scheduling, etc.)
+    - This is the biggest reason execution order is unpredictable.
+
+2. Global Interpreter Lock (GIL)
+
+    - Python (CPython) has a GIL, which allows only one thread to execute Python bytecode at a time.
+    - Even on a multi-core CPU, Python threads take turns.
+    - The GIL is periodically released (e.g., every few milliseconds or bytecode instructions).
+    - This leads to context switching (jumping between threads), creating interleaved outputs.
+
+3. Context Switching
+
+    - Threads can be paused and resumed at any time by the OS.
+    - Example: While t1 is running, the OS may pause it after 1 iteration and give CPU to t2.
+    - The switching point is unpredictable.
+
+4. Thread Start Timing
+
+    - Even though you write t1.start() first, the start call only requests the OS to run it.
+    - The OS may not schedule it immediately — it could run t2 first.
+    - So "start order" ≠ "execution order".
+
+5. I/O and Sleep
+
+    - When a thread calls time.sleep() or waits for I/O (file, network), the OS suspends it and lets other threads run.
+    - This is why in your code with sleep(1), the threads nicely interleave.
+    - Without sleep, one thread could hog the CPU for longer.
+
+6. Number of CPU Cores
+
+    - If you have multiple cores, the OS can run Python threads on different cores.
+    - But because of the GIL, only one thread runs Python code at a time — though C extensions (like NumPy) may bypass this.
+
+
+# Multiprocessing in Python
+## What is Multiprocessing?
+
+- In Python, a process is an independent program running in its own memory space.
+- Multiprocessing allows you to run multiple processes at the same time, so CPU-bound tasks can truly run in parallel.
+- Each process runs independently, so they don’t share memory by default.
+- Example
+    ```python
+    from multiprocessing import Process
+
+    # Function to calculate squares
+    def calc_square(numbers):
+        for n in numbers:
+            print(f"Square of {n} is {n*n}")
+
+    if __name__ == "__main__":
+        nums1 = [1, 2, 3]
+        nums2 = [4, 5, 6]
+
+        # Create two processes
+        p1 = Process(target=calc_square, args=(nums1,))
+        p2 = Process(target=calc_square, args=(nums2,))
+
+        # Start the processes
+        p1.start()
+        p2.start()
+
+        # Wait for both to finish
+        p1.join()
+        p2.join()
+
+        print("Done!")
+
+
+## Multi threading vs Multi processing
+| Feature                           | Multithreading                                                                          | Multiprocessing                                      |
+| --------------------------------- | --------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| **Definition**                    | Multiple threads within a single process                                                | Multiple independent processes                       |
+| **Memory**                        | Shared memory (threads can access same variables)                                       | Separate memory for each process                     |
+| **GIL (Global Interpreter Lock)** | Only one thread executes Python bytecode at a time → CPU-bound tasks not truly parallel | No GIL restriction → CPU-bound tasks run in parallel |
+| **Use Case**                      | I/O-bound tasks (networking, file operations)                                           | CPU-bound tasks (heavy computation)                  |
+| **Creation Overhead**             | Lightweight, quick to create threads                                                    | Heavyweight, creating processes is slower            |
+| **Crash Impact**                  | One thread crash may affect whole process                                               | One process crash usually does not affect others     |
+| **Communication**                 | Easy, shared variables                                                                  | Harder, requires IPC (Queue, Pipe, Manager)          |
+| **Execution**                     | Concurrent (pseudo-parallel for CPU-bound)                                              | True parallel execution on multiple cores            |
+
 
 -------------
 
@@ -1068,5 +1202,4 @@ Copying creates a new object from an existing object. In Python, you can do shal
 
     OUTPUT: Hi
             None
-
 
