@@ -322,3 +322,55 @@
 Total rows = 3 × 2 = 6.
 📌 No ON condition is used.
 📌 Mostly used for combinations, testing, or matrix-like data generation.
+
+
+# Aggregate functions – COUNT, SUM, AVG, MIN, MAX.
+
+| Function    | Description                                                | Example                              | Result         |
+| ----------- | ---------------------------------------------------------- | ------------------------------------ | -------------- |
+| **COUNT()** | Counts number of rows (or non-NULL values if column given) | `SELECT COUNT(*) FROM employees;`    | Total rows     |
+| **SUM()**   | Adds up all numeric values                                 | `SELECT SUM(salary) FROM employees;` | Total salary   |
+| **AVG()**   | Calculates average of numeric column                       | `SELECT AVG(salary) FROM employees;` | Average salary |
+| **MIN()**   | Finds minimum value                                        | `SELECT MIN(salary) FROM employees;` | Lowest salary  |
+| **MAX()**   | Finds maximum value                                        | `SELECT MAX(salary) FROM employees;` | Highest salary |
+
+--------------
+
+# GROUP BY
+
+## Purpose:
+
+- Used to group rows that have the same values in specified columns.
+- Usually used with aggregate functions (like COUNT, SUM, AVG, MIN, MAX) to get summary data.
+
+### How it works:
+
+- Groups rows by one or more columns
+- Each group returns one row in the result
+
+- Example:
+    ```SQL
+        SELECT department, COUNT(*) AS total_employees
+        FROM employees
+        GROUP BY department;
+
+--------
+
+# HAVING
+
+## Purpose:
+
+- Used to filter groups after GROUP BY is applied.
+- Key Point:
+    - Like WHERE, but for groups, not individual rows
+    - Can use aggregate functions in it
+
+- Example:
+    ```SQL
+        SELECT department, COUNT(*) AS total_employees
+        FROM employees
+        GROUP BY department
+        HAVING COUNT(*) > 5;
+
+----------------
+

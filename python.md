@@ -1042,6 +1042,40 @@ Copying creates a new object from an existing object. In Python, you can do shal
 | **Communication**                 | Easy, shared variables                                                                  | Harder, requires IPC (Queue, Pipe, Manager)          |
 | **Execution**                     | Concurrent (pseudo-parallel for CPU-bound)                                              | True parallel execution on multiple cores            |
 
+-------------
+
+# 1. What is async?
+
+- Async in Python is used to write asynchronous code, which allows your program to do other tasks while waiting for I/O operations (like network requests, file reads, or database calls) to complete.
+- Regular (synchronous) Python blocks until a task finishes.
+- Async lets you pause a function at certain points and let other tasks run.
+
+| Keyword     | Purpose                                                     |
+| ----------- | ----------------------------------------------------------- |
+| `async def` | Define an **asynchronous function** (coroutine)             |
+| `await`     | Wait for another coroutine to complete **without blocking** |
+
+- Exapmle:
+    ```python
+        import asyncio
+
+        async def say_hello():
+            print("Hello")
+            await asyncio.sleep(2)  # non-blocking sleep
+            print("World")
+
+        async def main():
+            await say_hello()
+            print("Done")
+
+        # Run the event loop
+        asyncio.run(main())
+
+    OUTPUT:
+        Hello
+        World
+        Done
+
 
 -------------
 
