@@ -269,10 +269,284 @@
     ```python
         df["Status"] = df["Salary"].apply(lambda x: "High" if x > 80000 else "Low")
 
+15. Drop duplicates
+
+    - drop_duplicates() is used to remove duplicate rows from a DataFrame.
+        ```python
+            import pandas as pd
+
+            df = pd.DataFrame({
+                'Name': ['John', 'Mary', 'John', 'Alex', 'Mary'],
+                'Department': ['IT', 'HR', 'IT', 'IT', 'HR'],
+                'Salary': [50000, 60000, 50000, 55000, 60000]
+            })
+
+            df.drop_duplicates()
+
+            df.drop_duplicates(keep='last') # first/last/False
+
+
+            # Remove duplicates based on 'Name' only
+            df.drop_duplicates(subset=['Name'])
+
+            df.drop_duplicates(subset=['Name'], inplace=True)
+
+    | Parameter | Purpose                                 |
+    | --------- | --------------------------------------- |
+    | `subset`  | Specify columns to consider             |
+    | `keep`    | 'first', 'last', or False               |
+    | `inplace` | Modify original DataFrame or return new |
+
+
+------------
 
 # Common Parameters
 
 ## index_col
 
+- Specifies which column(s) should be used as the row index of the DataFrame.
+
+    ```python
+        df = pd.read_excel("dummy_employees.xlsx", index_col=0)
+
+        df = pd.read_excel("dummy_employees.xlsx", index_col=["Department", "Name"])
+
+> Note: This makes the first column (index 0) the DataFrame index instead of the default 0,1,2,...(default range)
+> Can not use index-col with single column otherwise get  **Empty DataFrame**
+
+## usecols
+
+- Loads only specific columns from the file (by name or index).
+
+    ```python
+        df = pd.read_excel("dummy_employees.xlsx", usecols=["Department"])
+        df = pd.read_excel("dummy_employees.xlsx", usecols=["Name", "Salary"])
+
+        OUTPUT:
+            Department
+        0    Marketing
+        1        Sales
+        2           IT
+        3      Finance
+        4           HR
+        ..         ...
+        195         HR
+        196  Marketing
+        197  Marketing
+        198  Marketing
+        199    Finance
+
+## skiprows
+
+- Skips a given number (or list) of rows from the top of the file.
+
+    ```python
+    df = pd.read_excel("dummy_employees.xlsx", skiprows=2) #skip rows from 0
+    file3 = pd.read_excel('/content/dummy_employees.xlsx', index_col=0, usecols=["ID","Department","Salary"], skiprows=[4, 7, 9] ) # skip specific rows
+
+>Note: we can use it with the use-col because it will tries to skip the column ro as well unless or until we are not skipping the particular row 
+
+# DataFrame Basics
+
+## Viewing data (head(), tail(), shape, info(), describe())
+
+1. df.head(n)
+
+    - Shows the first n rows of the DataFrame.
+    - Default n=5.
+
+    ```python
+    file = pd.read_excel('/content/dummy_employees.xlsx', index_col=0, usecols=["ID","Department","Salary"], skiprows=[4, 7, 9] )
+
+    print(file.head(count))
+
+2. df.tail(n)
+
+    - Shows the last n rows of the DataFrame.
+    - Default n=5.
+    
+    ```python
+        file = pd.read_excel('/content/dummy_employees.xlsx', index_col=0, usecols=["ID","Department","Salary"], skiprows=[4, 7, 9] )
+        
+        print(file.tail(count))
+
+3. df.shape
+
+    - Returns a tuple (rows, columns) showing DataFrame dimensions.
+
+    ```python
+        df.shape
+
+        OUTPUT:
+        (100, 5)
+
+        100 → number of rows
+        5 → number of columns
+    
+4. df.info()
+
+- Gives a summary of the DataFrame:
+    - Column names
+    - Data types
+    - Non-null counts
+    - Memory usage
+
+    ```python
+        df.info()
+
+        OUTPUT:
+        <class 'pandas.core.frame.DataFrame'>
+            RangeIndex: 200 entries, 0 to 199
+            Data columns (total 6 columns):
+            #   Column        Non-Null Count  Dtype         
+            ---  ------        --------------  -----         
+            0   ID            200 non-null    int64         
+            1   Name          200 non-null    object        
+            2   Age           200 non-null    int64         
+            3   Department    200 non-null    object        
+            4   Salary        200 non-null    int64         
+            5   Joining_Date  200 non-null    datetime64[ns]
+            dtypes: datetime64[ns](1), int64(3), object(2)
+            memory usage: 9.5+ KB
+
+>Note: No need to call inside print, it will directly shows all the informations.
+
+5. df.describe()
+
+- Generates summary statistics for numeric columns (mean, std, min, max, quartiles).
+
+    ```python
+        df.describe() # default numeric
+        df.describe(include="object") #for string values columns
+        df.describe(include="all") # for all the columns
 
 
+**OUTPUT:**
+|index|ID|Age|Salary|Joining\_Date|
+|---|---|---|---|---|
+|count|200\.0|200\.0|200\.0|200|
+|mean|100\.5|38\.665|76591\.945|2021-12-01 12:00:00|
+|min|1\.0|18\.0|30412\.0|2020-01-05 00:00:00|
+|25%|50\.75|27\.75|54278\.0|2020-12-18 06:00:00|
+|50%|100\.5|40\.0|74453\.5|2021-12-01 12:00:00|
+|75%|150\.25|49\.25|98598\.0|2022-11-14 18:00:00|
+|max|200\.0|59\.0|119930\.0|2023-10-29 00:00:00|
+|std|57\.879184513951124|12\.604648380816508|26566\.93411883176|NaN|
+
+--------
+
+# Column access: df['col'], df[['col1','col2']]
+
+- Single and multiple
+    ```python
+        file[['Department', 'Age']] # multiple columns
+        file['Department'] # single column
+
+        OUTPUT:
+                Department	Age
+            0	Marketing	56
+            1	Sales	46
+            2	IT	32
+            3	Finance	25
+            4	HR	38
+
+-------------
+
+# Row access: loc[], iloc[]
+
+1. iloc[] → Index-based Access
+
+    - Uses integer positions (0-based).
+    - Syntax: df.iloc[row_index, column_index]
+
+    ```python
+        file.iloc[10:20] # for all column
+        file.iloc[range, column_index] # for specific column
+
+    OUTPUT:
+
+            Department
+        10	Sales
+        11	Sales
+        12	Finance
+        13	Sales
+        14	Finance
+        15	IT
+        16	Finance
+        17	Finance
+        18	Sales
+        19	Sales
+
+2. loc[] → Label-based Access
+
+    - Uses row and column labels.
+    - Syntax: df.loc[row_label, column_label]
+
+    ```python
+        # If index is default 0,1,2...
+        df.loc[0]             # first row
+        df.loc[0:5]           # rows 0 to 5 inclusive
+
+        # Access specific cell
+        df.loc[2, 'Salary']
+
+        # Access multiple columns for a row
+        df.loc[2, ['Name', 'Salary']]
+
+    
+3. loc[] → Label-based Access
+
+    - Uses row and column labels.
+    - Syntax: df.loc[row_label, column_label]
+
+    ```python
+        # If index is default 0,1,2...
+        df.loc[0]             # first row
+        df.loc[0:5]           # rows 0 to 5 inclusive
+
+        # Access specific cell
+        df.loc[2, 'Salary']
+
+        # Access multiple columns for a row
+        df.loc[2, ['Name', 'Salary']]
+
+-------------
+
+
+
+# Aggregation & Grouping
+
+1. Grouping Data: groupby()
+
+    - groupby() splits your DataFrame into groups based on column values.
+    - Then you can apply aggregation functions like sum(), mean(), count(), etc.
+
+        ```python
+            import pandas as pd
+
+            df = pd.DataFrame({
+                'Department': ['IT', 'HR', 'IT', 'HR', 'IT'],
+                'Salary': [50000, 60000, 55000, 65000, 52000],
+                'Age': [25, 30, 28, 35, 26]
+            })
+
+            # Group by Department
+            grouped = df.groupby('Department') #multiple columns 
+
+
+>Note: It returns a **DataFrameGroupBy object** — a special grouped object that you can use to perform aggregation, iteration, or transformation.
+
+2. Aggregation Functions
+    
+    ```python
+
+        grouped = file.groupby(['Department', 'Age'])['Salary'].sum()
+
+
+| Function/Method    | Purpose                               |
+| ------------------ | ------------------------------------- |
+| `groupby()`        | Split DataFrame into groups           |
+| `sum()`            | Sum of numeric values per group       |
+| `mean()`           | Mean of numeric values per group      |
+| `count()`/`size()` | Count rows per group                  |
+| `agg()`            | Apply multiple or custom aggregations |
