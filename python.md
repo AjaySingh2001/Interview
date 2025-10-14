@@ -1178,6 +1178,17 @@ Copying creates a new object from an existing object. In Python, you can do shal
         print()
 
 
+10. sort string of list
+    ```python
+        s = ['a', "aa", '100', '200', 'python', '300.12', '400']
+        # s = [21,34,23,243,5345,3]
+        for _ in range(len(s)):
+            for i in range(0, len(s)-1):
+                if s[i] > s[i+1]:
+                    s[i], s[i+1] = s[i+1], s[i]
+
+        print(s)
+
 # Confusing questions
 1. ```python
     def add_item(item, lst=[]):

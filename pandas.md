@@ -346,6 +346,19 @@
 
 >Note: we can use it with the use-col because it will tries to skip the column ro as well unless or until we are not skipping the particular row 
 
+## astype
+
+- In Pandas, astype() is used to convert the data type of a Series or DataFrame column to another type.
+
+- **Series.astype(dtype, copy=True, errors='raise')**
+    - dtype: target data type (e.g., int, float, str, 'category', 'datetime64').
+    - copy: if True, always returns a new object; if False.
+    - errors:
+        - 'raise' → raise error if conversion fails (default)
+        - 'ignore' → return original if conversion fails
+    
+>Note: Does not apply inplace changes
+
 # DataFrame Basics
 
 ## Viewing data (head(), tail(), shape, info(), describe())
@@ -550,3 +563,499 @@
 | `mean()`           | Mean of numeric values per group      |
 | `count()`/`size()` | Count rows per group                  |
 | `agg()`            | Apply multiple or custom aggregations |
+
+-----------------------
+
+# Series methods
+## Basic Arithmetic Operations
+| Operation        | Method                                                      |
+| ---------------- | ----------------------------------------------------------- |
+| Addition         | `Series.add(other, fill_value=None)`                        |
+| Subtraction      | `Series.sub(other, fill_value=None)` or `Series.subtract()` |
+| Multiplication   | `Series.mul(other, fill_value=None)` or `Series.multiply()` |
+| Division         | `Series.div(other, fill_value=None)` or `Series.divide()`   |
+| Floor Division   | `Series.floordiv(other, fill_value=None)`                   |
+| Modulus          | `Series.mod(other, fill_value=None)`                        |
+| Power / Exponent | `Series.pow(other, fill_value=None)`                        |
+
+## Unary Arithmetic Operations
+
+| Operation | Method                     |
+| --------- | -------------------------- |
+| Absolute  | `Series.abs()`             |
+| Negation  | `Series.neg()`             |
+| Rounding  | `Series.round(decimals=0)` |
+
+## Cumulative / Aggregate Arithmetic Operations
+
+| Operation          | Method             |
+| ------------------ | ------------------ |
+| Cumulative sum     | `Series.cumsum()`  |
+| Cumulative product | `Series.cumprod()` |
+| Cumulative min     | `Series.cummin()`  |
+| Cumulative max     | `Series.cummax()`  |
+
+## Other Useful Arithmetic Methods
+
+| Operation            | Method                                             |
+| -------------------- | -------------------------------------------------- |
+| Clip values          | `Series.clip(lower=None, upper=None)`              |
+| Multiply with factor | `Series.mul(other, fill_value=None)` (same as `*`) |
+| Add with factor      | `Series.add(other, fill_value=None)` (same as `+`) |
+
+## Series comparisons
+
+| Method             | Equivalent Operator | Example     |
+| ------------------ | ------------------- | ----------- |
+| `Series.eq(other)` | `==`                | `s1.eq(s2)` |
+| `Series.ne(other)` | `!=`                | `s1.ne(s2)` |
+| `Series.gt(other)` | `>`                 | `s1.gt(s2)` |
+| `Series.ge(other)` | `>=`                | `s1.ge(s2)` |
+| `Series.lt(other)` | `<`                 | `s1.lt(s2)` |
+| `Series.le(other)` | `<=`                | `s1.le(s2)` |
+
+
+# Questions
+
+1. Creating a Series
+    ```python
+        import pandas as pd
+
+        sr = [1,2,4,5,6]
+        print(pd.Series(sr))
+
+        OUTPUT:
+        0    1
+        1    2
+        2    4
+        3    5
+        4    6
+
+2. Series to List Conversion
+    ```python
+        sr = [1,2,4,5,6]
+
+        series = pd.Series(sr)
+        print(type(series))
+
+        srtolst = series.to_list()
+        print(type(srtolst))
+        print(srtolst)
+
+        OUTPUT:
+        <class 'pandas.core.series.Series'>
+        <class 'list'>
+        [1, 2, 4, 5, 6]
+
+3. Write a Pandas program to add, subtract, multiple and divide two Pandas Series.
+
+    ```python
+        # SEries arithmatic
+        a,b = [2, 4, 6, 8, 10], [1, 3, 5, 7, 9]
+        print(a)
+        print(b)
+
+        sa = pd.Series(a)
+        sb = pd.Series(b)
+        print(sa)
+        print(sb)
+        print(sa.add(sb)) # Add
+
+        print("sub", sa.sub(sb)) # Subtract
+
+        print("Mul", sa.mul(sb)) # multiply
+
+        print("Div", sa.div(sb)) # divide
+
+4. Compare the elements of the two Pandas Series.
+
+    ```python
+        a,b = [2, 4, 6, 8, 10], [1, 3, 5, 7, 10]
+        sa = pd.Series(a)
+        sb = pd.Series(b)
+        print("Equal", sa.eq(sb)) # Equal
+        print("Greater then equal to", sa.ge(sb)) # ge
+        print("Greater Then", sa.gt(sb)) # gt
+        print("Less Then", sa.lt(sb)) # lt
+    
+        OUTPUT:
+        Equal 0    False
+            1    False
+            2    False
+            3    False
+            4     True
+
+>Note: pd.Series() automatically takes the keys as the index and values as the data.
+
+5. Numpy array to series
+
+    ```python
+
+        a = np.array([10, 20, 30, 40, 50])
+        s = pd.Series(a)
+
+        print(type(a))
+
+        print(pd.Series(a))
+
+
+6. Change Series DataType
+
+    ```python
+        b = [2, 4, 6, 8, 10]
+
+        s = pd.Series(b)
+
+        print(s.dtype)
+
+        s2 = s.astype(bool, copy=False)
+
+        print(s2)
+
+7. Convert the first column of a DataFrame as a Series.
+
+    ```python
+        data = {
+            'Name': ['Alice', 'Bob', 'Charlie'],
+            'Age': [25, 30, 35],
+            'City': ['New York', 'London', 'Paris']
+        }
+
+
+        df = pd.DataFrame(data)
+        print(pd.Series(data['Name']))
+
+8. Series to Array
+
+    ```python
+        # Series to array
+        s = ['100', '200', 'python', '300.12', '400']
+        s1 = pd.Series(s)
+        print(s1.dtype)
+
+        s2 = s1.to_numpy()
+        print(type(s2))
+        print(s2)
+
+        OUTPUT:
+            object
+            <class 'numpy.ndarray'>
+            ['100' '200' 'python' '300.12' '400']
+
+9. Flatten Series of Lists
+
+    ```python
+        # Example Series: each element is a list
+        s = pd.Series([[1, 2, 3], [4, 5], [6]])
+
+        # Step 1: Expand each list in the Series into separate columns of a DataFrame
+        # apply(pd.Series) takes each element of the Series (a list) and converts it into a row of a DataFrame
+        df_expanded = s.apply(pd.Series)
+        """
+        Example df_expanded:
+            0    1    2
+        0    1    2  3.0
+        1    4    5  NaN
+        2    6  NaN  NaN
+        """
+
+        # Step 2: Stack the DataFrame to convert columns into a single Series
+        # stack() compresses the DataFrame into a single column (Series) and drops NaN values by default
+        s_stacked = df_expanded.stack()
+        """
+        Example s_stacked (MultiIndex):
+        0  0    1
+        1    2
+        2    3
+        1  0    4
+        1    5
+        Example s_flattened:
+        0    1
+        1    2
+        2    3
+        3    4
+        4    5
+        5    6
+        dtype: int64
+        """
+
+        # Final flattened Series
+        print(s_flattened)
+
+        Process:
+        1. convert all into series
+        2. stack them using stack()
+        3. then reset index by using the reset_index(drop=True)
+
+
+10. sort the series
+    ```python
+        # 1st way
+        s = ['100', '200', 'python', '300.12', '400']
+        s1 = pd.Series(s).sort_values()
+        print(s1)
+
+        # 2nd way
+            convert into list and then sort and again convert it into series
+        s2 = s1.to_list()
+        for _ in range(len(s2)):
+            for i in range(0, len(s2)-1):
+                if s2[i]>s2[i+1]:
+                    s2[i], s2[i+1] = s2[i+1],s2[i]
+        print(pd.Series(s2))
+
+
+
+11. Creating a DataFrame from a Dictionary
+    ```python
+        d = {
+            "Name": [11,22,33,44,55],
+            "Age": ["dsf", "skldfn", "dsifjn"]
+        }
+        print(pd.DataFrame(d, ))
+    
+12. Selecting Specific Columns and Rows
+
+    ```python
+        df = pd.DataFrame(exam_data)
+        df.loc[1:7, ["name", "qualify"]]
+
+
+13. Selecting Rows Where Attempts > 2
+
+    ```python
+        df[df['attempts']>2]
+        
+>Note: In Pandas, the syntax df[condition] is called Boolean indexing.
+
+14. Apply multiple conditions
+
+    ```python
+        df.loc[(df['score']>15) & (df['attempts']<2)]
+
+15. Rename Column
+
+    ```python
+        df.rename(columns={"name": "Student"}, inplace=True)
+
+
+
+# Joins and Merging
+## Merge
+- pd.merge() combines two DataFrames based on one or more common columns (keys) — just like SQL joins.
+- It matches rows from both DataFrames using those keys.
+- Syntax:
+    **pd.merge(left, right, how='inner', on=None, left_on=None, right_on=None)**
+
+    | Parameter              | Description                                                    |
+    | ---------------------- | -------------------------------------------------------------- |
+    | `left`, `right`        | DataFrames to merge                                            |
+    | `how`                  | Type of join: `'inner'`, `'outer'`, `'left'`, `'right'`        |
+    | `on`                   | Column(s) common to both DataFrames to join on                 |
+    | `left_on` / `right_on` | Use if the column names differ between the DataFrames          |
+    | `suffixes`             | Add suffixes to overlapping column names (e.g. `('_x', '_y')`) |
+
+
+1. Join DataFrames along Rows (Join Rows)
+    ```python
+        # DataFrame 1
+        s1 = pd.DataFrame({
+            "student_id": ["S1", "S2", "S3", "S4", "S5"],
+            "name": ["Danniella Fenton", "Ryder Storey", "Bryce Jensen", "Ed Bernal", "Kwame Morin"],
+            "marks": [200, 210, 190, 222, 199]
+        })
+
+        # DataFrame 2
+        s2 = pd.DataFrame({
+            "student_id": ["S4", "S5", "S6", "S7", "S8"],
+            "name": ["Scarlette Fisher", "Carla Williamson", "Dante Morse", "Kaiser William", "Madeeha Preston"],
+            "marks": [201, 200, 198, 219, 201]
+        })
+
+        pd.concat([s1, s2], axis=0) # default axis = 0(row), optional axis=1(column)
+
+
+2. Join DataFrames along Columns (Join Columns)
+    ```python
+        # Student details
+        students = pd.DataFrame({
+            'student_id': ['S1', 'S2', 'S3', 'S4', 'S5'],
+            'name': ['Ajay', 'Riya', 'Karan', 'Tina', 'Maya'],
+            'city': ['Delhi', 'Mumbai', 'Pune', 'Delhi', 'Chennai']
+        })
+
+        # Exam scores
+        scores = pd.DataFrame({
+            'id': ['S3', 'S4', 'S5', 'S6', 'S7'],
+            'marks': [85, 90, 78, 88, 92],
+            'subject': ['Maths', 'Science', 'English', 'Maths', 'Science']
+        })
+
+        # Inner Join: Provide common rows
+        pd.merge(students, scores, left_on='student_id', right_on='id', how='inner')
+
+
+        # Left Join: All records of left side. All from students + matches from scores.
+        pd.merge(students, scores, left_on='student_id', right_on='id', how='left')
+
+        # Right Join: Keep all scores, even if the student isn’t in the students table.
+        pd.merge(students, scores, left_on='student_id', right_on='id', how='right')
+
+
+        # Outer Join: Keep all records from both DataFrames.
+        pd.merge(students, scores, left_on='student_id', right_on='id', how='outer')
+
+
+        # Customising Overlapping Column Names: Avoid duplicate column names (student_id and id):
+        pd.merge(students, scores, left_on='student_id', right_on='id', how='outer', suffixes=('_student', '_score'))
+
+        In above case if there are columns with the same in each table then we use suffix then so it will not be overriden. and it will look like name_student, and name_score in output
+
+
+3. Append Rows to Existing DataFrame
+    ```python
+        students = pd.DataFrame({
+            'student_id': ['S1', 'S2', 'S3', 'S4', 'S5'],
+            'name': ['Ajay', 'Riya', 'Karan', 'Tina', 'Maya'],
+            'city': ['Delhi', 'Mumbai', 'Pune', 'Delhi', 'Chennai']
+        })
+
+        students.loc[len(students)] = ['S6', 'Aarav', 'Kolkata']
+
+        # Add multiple data
+        new_row = pd.DataFrame({
+            'student_id': ['S7'],
+            'name': ['gaurav'],
+            'city': ['Kolkata']
+        })
+        students = pd.concat([students, new_row], ignore_index=True)
+
+>Note: ignore_index=True: Reset index follow the default ones otherwise it will starts from 0 for the concatinated once.
+
+4. Append List of Dictionaries/Series
+
+    ```python
+        students = pd.DataFrame({
+            'student_id': ['S1', 'S2', 'S3', 'S4', 'S5'],
+            'name': ['Som', 'Riya', 'Karan', 'Tina', 'Maya'],
+            'city': ['Delhi', 'Mumbai', 'Pune', 'Delhi', 'Chennai']
+        })
+
+        students.loc[len(students)] = ['S6', 'Aarav', 'Kolkata']
+        new_row = pd.DataFrame({
+            'student_id': ['S7'],
+            'name': ['gaurav'],
+            'city': ['Kolkata']
+        })
+        students = pd.concat([students, new_row], ignore_index=True)
+        data = [
+                ['S5', 'Tina', 'Delhi'],
+                ['S6', 'Tin1', 'Delhi'],
+                ['S7', 'Tin2', 'Delhi'],
+                ['S8', 'Tin3', 'Delhi'],
+                ['S9', 'Tin4', 'Delhi']
+            ]
+        series = pd.DataFrame(data, columns=students.columns)  
+        students = pd.concat([students, series], ignore_index=True)
+
+        # add list of dictionaries
+        new_data = [
+            {'student_id': 'S11', 'name': 'qwe', 'city': 'Delhi'},
+            {'student_id': 'S12', 'name': '12we', 'city': 'Chennai'},
+            {'student_id': 'S13', 'name': 'qwe11', 'city': 'Kolkata'}
+        ]
+
+        students = pd.concat([students, pd.DataFrame(new_data)], ignore_index=True)
+        students
+
+
+5. Join Rows and Merge with Another DataFrame: Write a Pandas program to join the two given dataframes along rows and merge with another dataframe along the common column id.
+
+    ```python
+        Write a Pandas program to join the two given dataframes along rows and merge with another dataframe along the common column id.
+
+
+        # Student DataFrame 1
+        student_data1 = pd.DataFrame({
+            'student_id': ['S1', 'S2', 'S3', 'S4', 'S5'],
+            'name': ['Danniella Fenton', 'Ryder Storey', 'Bryce Jensen', 'Ed Bernal', 'Kwame Morin'],
+            'marks': [200, 210, 190, 222, 199]
+        })
+
+        # Student DataFrame 2
+        student_data2 = pd.DataFrame({
+            'student_id': ['S4', 'S5', 'S6', 'S7', 'S8'],
+            'name': ['Scarlette Fisher', 'Carla Williamson', 'Dante Morse', 'Kaiser William', 'Madeeha Preston'],
+            'marks': [201, 200, 198, 219, 201]
+        })
+
+        concat = pd.concat([student_data1, student_data2], ignore_index=True)
+
+        # Exam DataFrame
+        exam_data = pd.DataFrame({
+            'student_id': ['S1', 'S2', 'S3', 'S4', 'S5', 'S7', 'S8', 'S9', 'S10', 'S11', 'S12', 'S13'],
+            'exam_id': [23, 45, 12, 67, 21, 55, 33, 14, 56, 83, 88, 12]
+        })
+
+        merged_data = pd.merge(concat, exam_data, on="student_id")
+        merged_data
+
+    
+## Grouping and aggregating
+
+1. Grouping by School Code: Write a Pandas program to split the following dataframe into groups based on school code. Also check the type of GroupBy object.
+
+    ```python
+        data = pd.DataFrame({
+            'school': ['s001', 's002', 's003', 's001', 's002', 's004'],
+            'class': ['V', 'V', 'VI', 'VI', 'V', 'VI'],
+            'name': ['Alberto Franco', 'Gino Mcneill', 'Ryan Parkes', 'Eesha Hinton', 'Gino Mcneill', 'David Parkes'],
+            'date_Of_Birth': ['15/05/2002', '17/05/2002', '16/02/1999', '25/09/1998', '11/05/2002', '15/09/1997'],
+            'age': [12, 12, 13, 13, 14, 12],
+            'height': [173, 192, 186, 167, 151, 159],
+            'weight': [35, 32, 33, 30, 31, 32],
+            'address': ['street1', 'street2', 'street3', 'street1', 'street2', 'street4']
+        }, index=['S1', 'S2', 'S3', 'S4', 'S5', 'S6'])
+
+
+        data.count()
+        d = data.groupby("school")
+        for school, group in d:
+            print(school)
+            print(group)
+
+2. Grouping by School Code with Age Aggregation: Write a Pandas program to split the following dataframe by school code and get mean, min, and max value of age for each school.
+
+    ```python
+        group = data.groupby("school")
+
+        print("Mean age for each school:")
+        print(group["age"].mean())
+
+        print("\nMax age for each school:")
+        print(group["age"].max())
+
+        print("\nMin age for each school:")
+        print(group["age"].min())
+
+3. Grouping by School Code and Class: Write a Pandas program to split the following given dataframe into groups based on school code and class, and call specific group.
+
+    ```python
+        data = pd.DataFrame({
+            'school': ['s001', 's002', 's003', 's001', 's002', 's004'],
+            'class': ['V', 'V', 'VI', 'VI', 'V', 'VI'],
+            'name': ['Alberto Franco', 'Gino Mcneill', 'Ryan Parkes', 'Eesha Hinton', 'Gino Mcneill', 'David Parkes'],
+            'date_Of_Birth': ['15/05/2002', '17/05/2002', '16/02/1999', '25/09/1998', '11/05/2002', '15/09/1997'],
+            'age': [12, 12, 13, 13, 14, 12],
+            'height': [173, 192, 186, 167, 151, 159],
+            'weight': [35, 32, 33, 30, 31, 32],
+            'address': ['street1', 'street2', 'street3', 'street1', 'street2', 'street4']
+        }, index=['S1', 'S2', 'S3', 'S4', 'S5', 'S6'])
+
+        d = data.groupby("school")
+        # {school:group.to_dict("records") for school, group in d}
+
+        list(d)
+
+        # call specific group
+        print(d.get_group("s001"))
