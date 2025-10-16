@@ -615,6 +615,44 @@
 | `Series.le(other)` | `<=`                | `s1.le(s2)` |
 
 
+#  Common buil in aggregated functions
+
+| Function    | Description               |
+| ----------- | ------------------------- |
+| `sum()`     | Sum of values             |
+| `mean()`    | Mean (average)            |
+| `median()`  | Median value              |
+| `mode()`    | Most frequent value       |
+| `min()`     | Minimum value             |
+| `max()`     | Maximum value             |
+| `count()`   | Number of non-null values |
+| `nunique()` | Number of unique values   |
+| `std()`     | Standard deviation        |
+| `var()`     | Variance                  |
+| `prod()`    | Product of values         |
+| `first()`   | First value in group      |
+| `last()`    | Last value in group       |
+
+------------
+
+# query() Method
+- Filter rows in a DataFrame using a SQL-like expression for better readability and performance.
+- Syntax
+    - DataFrame.query(expr, inplace=False, **kwargs)
+
+    ```python
+        import pandas as pd
+
+        df = pd.DataFrame({
+            "product_id": [0, 1, 2, 3, 4],
+            "low_fats": ["Y", "Y", "N", "Y", "N"],
+            "recyclable": ["N", "Y", "Y", "Y", "N"]
+        })
+
+        result = df.query('low_fats == "Y" and recyclable == "Y"')
+        print(result)
+
+
 # Questions
 
 1. Creating a Series
@@ -1059,3 +1097,183 @@
 
         # call specific group
         print(d.get_group("s001"))
+
+
+4. Grouping by Two Columns and Sorting Aggregated Results: Write a Pandas program to split a dataset to group by two columns and then sort the aggregated results within the groups.
+
+    ```python
+        import pandas as pd
+
+        # Create sample dataset with order details
+        data = pd.DataFrame({
+            'ord_no': [70001, 70009, 70002, 70004, 70007, 70005, 70008, 70010, 70003, 70012, 70011, 70013],
+            'purch_amt': [150.50, 270.65, 65.26, 110.50, 948.50, 2400.60, 5760.00, 1983.43, 2480.40, 250.45, 75.29, 3045.60],
+            'ord_date': ['2012-10-05', '2012-09-10', '2012-10-05', '2012-08-17', '2012-09-10', 
+                        '2012-07-27', '2012-09-10', '2012-10-10', '2012-10-10', '2012-06-27', 
+                        '2012-08-17', '2012-04-25'],
+            'customer_id': [3005, 3001, 3002, 3009, 3005, 3007, 3002, 3004, 3009, 3008, 3003, 3002],
+            'salesman_id': [5002, 5005, 5001, 5003, 5002, 5001, 5001, 5006, 5003, 5002, 5007, 5001]
+        })
+
+        # 1️⃣ Group the data by 'customer_id' and 'salesman_id'
+        # Each combination (customer, salesman) will form a separate group
+        # Then aggregate the total purchase amount per pair using sum()
+        new_data = data.groupby(["customer_id", "salesman_id"]).agg({"purch_amt": sum}) 
+
+        # 2️⃣ Re-group by only 'customer_id' (level=0 in MultiIndex)
+        #    'group_keys=False' prevents pandas from adding extra grouping labels
+        #    Then, inside each customer group, select the top purchase amounts
+        sorted_data = new_data.groupby(level=0, group_keys=False)["purch_amt"].nlargest()
+
+        # 3️⃣ Display the final result showing:
+        #    - Each customer_id
+        #    - Corresponding salesman_id
+        #    - Total purchase amount (sorted descending within each group)
+        print(sorted_data)
+
+
+5.  Grouping by Customer ID with List of Order Dates: Write a Pandas program to split the following dataframe into groups based on customer id and create a list of order date for each group.
+
+    ```python
+        data = pd.DataFrame({
+            'ord_no': [70001, 70009, 70002, 70004, 70007, 70005, 70008, 70010, 70003, 70012, 70011, 70013],
+            'purch_amt': [150.50, 270.65, 65.26, 110.50, 948.50, 2400.60, 5760.00, 1983.43, 2480.40, 250.45, 75.29, 3045.60],
+            'ord_date': ['2012-10-05', '2012-09-10', '2012-10-05', '2012-08-17', '2012-09-10', 
+                        '2012-07-27', '2012-09-10', '2012-10-10', '2012-10-10', '2012-06-27', 
+                        '2012-08-17', '2012-04-25'],
+            'customer_id': [3005, 3001, 3002, 3009, 3005, 3007, 3002, 3004, 3009, 3008, 3003, 3002],
+            'salesman_id': [5002, 5005, 5001, 5003, 5002, 5001, 5001, 5006, 5003, 5002, 5007, 5001]
+        })
+
+        new_data = data.groupby("customer_id")["ord_date"].apply(list)
+        new_data
+
+# Leetcode Questions
+
+1. A country is big if:
+    - it has an area of at least three million (i.e., 3000000 km2), or
+    - it has a population of at least twenty-five million (i.e., 25000000).
+
+    ```python
+        data = {
+            "name": ["Afghanistan", "Albania", "Algeria", "Andorra", "Angola"],
+            "continent": ["Asia", "Europe", "Africa", "Europe", "Africa"],
+            "area": [652230, 28748, 2381741, 468, 1246700],
+            "population": [25500100, 2831741, 37100000, 78115, 20609294],
+            "gdp": [20343000000, 12960000000, 188681000000, 3712000000, 100990000000]
+        }
+
+        world = pd.DataFrame(data)
+
+        #Basic version
+
+            # new_data = world[(world["population"]>=25000000) | (world["area"]>=3000000)]
+            # new_data[["name", "population", "area"]]
+
+        #Optimized Version
+        new_data = world.loc[(world["population"]>=25000000) | (world["area"]
+        >=3000000), ["name", "population", "area"]]
+
+        #more refind
+        new_data = world.query('population >= 25000000 or area >= 3000000')[["name", "population", "area"]]
+
+        new_data
+
+
+2. Write a solution to find the ids of products that are both low fat and recyclable.
+    - Return the result table in any order. The result format is in the following example.
+
+    ```python
+        data = {
+            "product_id": [0, 1, 2, 3, 4],
+            "low_fats": ["Y", "Y", "N", "Y", "N"],
+            "recyclable": ["N", "Y", "Y", "Y", "N"]
+        }
+        df = pd.DataFrame(data)
+        # df.loc[((df["low_fats"]=="Y") & (df['recyclable']=="Y")), ["product_id"]]
+        df.query('low_fats == "Y" and recyclable == "Y"')[["product_id"]]
+
+    
+3. Write a solution to find all customers who never order anything.
+= Return the result table in any order. The result format is in the following example.
+
+    ```python
+        # Customers table
+        customers_data = {
+            "id": [1, 2, 3, 4],
+            "name": ["Joe", "Henry", "Sam", "Max"]
+        }
+        customers = pd.DataFrame(customers_data)
+
+        # Orders table
+        orders_data = {
+            "id": [1, 2],
+            "customerId": [3, 1]
+        }
+        orders = pd.DataFrame(orders_data)
+
+        customers.loc[~customers['id'].isin(orders['customerId']), ["name"]].rename(columns={"name":"Customers"})
+    ```
+
+4. Write a solution to find all the authors that viewed at least one of their own articles.Return the result table sorted by id in ascending order. The result format is in the following example.
+
+    ```python
+        data = {
+            "article_id": [1, 1, 2, 2, 4, 3, 3],
+            "author_id": [3, 3, 7, 7, 7, 4, 4],
+            "viewer_id": [5, 6, 7, 6, 1, 4, 4],
+            "view_date": [
+                "2019-08-01",
+                "2019-08-02",
+                "2019-08-01",
+                "2019-08-02",
+                "2019-07-22",
+                "2019-07-21",
+                "2019-07-21",
+            ],
+        }
+
+
+        df = pd.DataFrame(data)
+        pd.DataFrame({"id": sorted(pd.Series(df.query("author_id == viewer_id")["author_id"].unique()))})
+
+
+5. Write a solution to fix the names so that only the first character is uppercase and the rest are lowercase. Return the result table ordered by user_id.
+
+    ```python
+        data = {
+            "user_id": [1, 2],
+            "name": ["aLice", "bOB"]
+        }
+
+        users = pd.DataFrame(data)
+
+        users["name"] = users["name"].str.capitalize()
+        users[['user_id']].sort_values(by="user_id", ascending=True)
+
+
+6. Write a solution to find the users who have valid emails. 
+    - A valid e-mail has a prefix name and a domain where:
+    - The prefix name is a string that may contain letters (upper or lower case), digits underscore '_', period '.', and/or dash '-'. 
+    - The prefix name must start with a letter.
+    - The domain is '@leetcode.com'.
+
+        ```python
+            data = {
+                "user_id": [1, 2, 3, 4, 5, 6, 7],
+                "name": ["Winston", "Jonathan", "Annabelle", "Sally", "Marwan", "David", "Shapiro"],
+                "mail": [
+                    "winston@leetcode.com",
+                    "jonathanisgreat",
+                    "bella-@leetcode.com",
+                    "sally.come@leetcode.com",
+                    "quarz#2020@leetcode.com",
+                    "david69@gmail.com",
+                    ".shapo@leetcode.com"
+                ]
+            }
+
+            users = pd.DataFrame(data)
+
+            users.loc[users['mail'].str.match(r'^[A-Za-z0-9][A-Za-z0-9._-]*@leetcode\.com$')]
+

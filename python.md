@@ -369,18 +369,18 @@ Copying creates a new object from an existing object. In Python, you can do shal
 
 ## What is a Dictionary?
 
-    - A dictionary is an unordered, mutable collection of key-value pairs in Python.
-    - Keys are unique and immutable (str, int, tuple, etc.)
-    - Values can be any data type and can be duplicated
+- A dictionary is an unordered, mutable collection of key-value pairs in Python.
+- Keys are unique and immutable (str, int, tuple, etc.)
+- Values can be any data type and can be duplicated
 
-        ```python
+    ```python
 
-        student = {
-            "name": "Ajay",
-            "age": 20,
-            "city": "Pune"
-        }
-        ```
+    student = {
+        "name": "Ajay",
+        "age": 20,
+        "city": "Pune"
+    }
+    ```
 
 ### common methods
 
@@ -1248,3 +1248,11 @@ Copying creates a new object from an existing object. In Python, you can do shal
     OUTPUT: Hi
             None
 
+8. ```python
+        lst = [False, False, False, True, False]
+
+        l = [x*100 for x in lst]
+        print(l)
+
+        OUTPUT:
+        [0, 0, 0, 100, 0]
