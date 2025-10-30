@@ -1148,6 +1148,47 @@
         new_data = data.groupby("customer_id")["ord_date"].apply(list)
         new_data
 
+6. Grouping by Customer ID – Purchase Amount Aggregation: Write a Pandas program to split a dataset, group by one column and get mean, min, and max values by group. Using the following dataset find the mean, min, and max values of purchase amount (purch_amt) group by customer id (customer_id).
+
+    ```python
+        import pandas as pd
+
+        data = {
+            "ord_no": [70001, 70009, 70002, 70004, 70007, 70005, 70008, 70010, 70003, 70012, 70011, 70013],
+            "purch_amt": [150.50, 270.65, 65.26, 110.50, 948.50, 2400.60, 5760.00, 1983.43, 2480.40, 250.45, 75.29, 3045.60],
+            "ord_date": ["2012-10-05", "2012-09-10", "2012-10-05", "2012-08-17", "2012-09-10", 
+                        "2012-07-27", "2012-09-10", "2012-10-10", "2012-10-10", "2012-06-27", 
+                        "2012-08-17", "2012-04-25"],
+            "customer_id": [3005, 3001, 3002, 3009, 3005, 3007, 3002, 3004, 3009, 3008, 3003, 3002],
+            "salesman_id": [5002, 5005, 5001, 5003, 5002, 5001, 5001, 5006, 5003, 5002, 5007, 5001]
+        }
+
+        df = pd.DataFrame(data)
+        result = df.groupby("customer_id")
+        result.agg({"purch_amt": ["mean", "min", "max"]})
+
+7. Grouping by Two Columns with Row Count: Write a Pandas program to split a dataset to group by two columns and count by each row.
+
+    ```python
+        import pandas as pd
+
+        data = {
+            "ord_no": [70001, 70009, 70002, 70004, 70007, 70005, 70008, 70010, 70003, 70012, 70011, 70013],
+            "purch_amt": [150.50, 270.65, 65.26, 110.50, 948.50, 2400.60, 5760.00, 1983.43, 2480.40, 250.45, 75.29, 3045.60],
+            "ord_date": ["2012-10-05", "2012-09-10", "2012-10-05", "2012-08-17", "2012-09-10", 
+                        "2012-07-27", "2012-09-10", "2012-10-10", "2012-10-10", "2012-06-27", 
+                        "2012-08-17", "2012-04-25"],
+            "customer_id": [3005, 3001, 3002, 3009, 3005, 3007, 3002, 3004, 3009, 3008, 3003, 3002],
+            "salesman_id": [5002, 5005, 5001, 5003, 5002, 5001, 5001, 5006, 5003, 5002, 5007, 5001]
+        }
+
+        df = pd.DataFrame(data)
+
+        result = df.groupby(["customer_id", "salesman_id"]).size().reset_index(name="row_count")
+        result
+
+>**Note:** Converts an series into the dataframe with the index column name as row_count
+
 # Leetcode Questions
 
 1. A country is big if:
