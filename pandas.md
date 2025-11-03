@@ -1318,3 +1318,64 @@
 
             users.loc[users['mail'].str.match(r'^[A-Za-z0-9][A-Za-z0-9._-]*@leetcode\.com$')]
 
+# Read EXCELFILE
+
+| Feature         | `pd.ExcelFile()`                                                                                                        | `pd.read_excel()`                                                |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| **Purpose**     | Opens an Excel file once and allows reading multiple sheets efficiently.                                                | Reads data directly from an Excel sheet into a DataFrame.        |
+| **Usage**       | Used when you need to access multiple sheets from the same workbook.                                                    | Used when you need to read a single sheet quickly.               |
+| **Performance** | Faster for reading multiple sheets (file parsed once).                                                                  | Slower for multiple reads (file parsed each time).               |
+| **Example**     | `python<br>xls = pd.ExcelFile("data.xlsx")<br>df1 = pd.read_excel(xls, "Sheet1")<br>df2 = pd.read_excel(xls, "Sheet2")` | `python<br>df = pd.read_excel("data.xlsx", sheet_name="Sheet1")` |
+
+>**Tip:** Use ExcelFile when working with multiple sheets; use read_excel for one-time reads.
+
+
+## Read file
+
+- Reading xl file using ExcelFile
+
+    ```python
+
+        Syntax:
+            pd.ExcelFile(path, engine=None, storage_options=None)
+
+        emp_data = pd.ExcelFile("company_data.xlsx")
+        emp_data.parse()
+
+| Parameter           | Description                                                                          |
+| ------------------- | ------------------------------------------------------------------------------------ |
+| **path**            | File path or URL of the Excel file (e.g., `"data.xlsx"`).                            |
+| **engine**          | Parser engine: `"openpyxl"` for `.xlsx`, `"xlrd"` for `.xls`. Usually auto-detected. |
+| **storage_options** | Extra options for remote storage like S3, GCS, etc. (optional).                      |
+
+
+### parse()
+- When you use:
+    - emp_data = pd.ExcelFile("employees.xlsx")
+    - You’re loading the Excel file structure, not the data yet.
+    - It gives you an ExcelFile object — a kind of “Excel reader” that knows:
+        - What sheets are inside,
+        - How to read them efficiently.
+
+- Then we use:
+    - df = emp_data.parse("Sheet1")
+    - This tells Pandas:
+        - Now read the actual data from the sheet named Sheet1 and return it as a DataFrame.
+
+| Step | Code                                   | Purpose                                             |
+| ---- | -------------------------------------- | --------------------------------------------------- |
+| 1    | `emp_data = pd.ExcelFile("file.xlsx")` | Open file, inspect or prepare to read               |
+| 2    | `emp_data.sheet_names`                 | Check all sheet names                               |
+| 3    | `emp_data.parse("Sheet1")`             | Actually load data from that sheet into a DataFrame |
+
+
+### Most commonly used method of EXCELFILE
+
+| **Method / Attribute**          | **Description**                                                                     | **Example**                |
+| ------------------------------- | ----------------------------------------------------------------------------------- | -------------------------- |
+| `sheet_names`                   | Returns a list of all sheet names in the Excel file.                                | `emp_data.sheet_names`     |
+| `parse(sheet_name=0, **kwargs)` | Reads data from a specified sheet into a DataFrame.                                 | `emp_data.parse('Sheet1')` |
+| `close()`                       | Closes the Excel file to free system resources.                                     | `emp_data.close()`         |
+| `book`                          | Returns the underlying workbook object (for engine-specific use, e.g., `openpyxl`). | `emp_data.book`            |
+| `io`                            | Returns the path or buffer of the Excel file that was read.                         | `emp_data.io`              |
+| `engine`                        | Shows which engine is used to read the file (`openpyxl`, `xlrd`, etc.).             | `emp_data.engine`          |
