@@ -350,9 +350,18 @@ Total rows = 3 × 2 = 6.
 
 - Example:
     ```SQL
-        SELECT department, COUNT(*) AS total_employees
-        FROM employees
-        GROUP BY department;
+    SELECT 
+        customerName, 
+        city, 
+        state, 
+        postalCode, 
+        country
+    FROM
+        customers
+    ORDER BY customerName;
+            SELECT department, COUNT(*) AS total_employees
+            FROM employees
+            GROUP BY department;
 
 --------
 
@@ -373,4 +382,141 @@ Total rows = 3 × 2 = 6.
         HAVING COUNT(*) > 5;
 
 ----------------
+
+
+# Advance SQL
+
+## Stored Procedures
+### What is a Stored Procedure?
+
+- A stored procedure is a saved block of SQL code stored in the database.
+You can call it anytime to run that code again.
+
+- Think of it like a function in Python — you define it once, then execute (call) it when needed.
+
+- The following SELECT statement returns all rows in the table customers from the sample database:
+
+    ```sql
+        SELECT 
+            customerName, 
+            city, 
+            state, 
+            postalCode, 
+            country
+        FROM
+            customers
+        ORDER BY customerName;
+
+- If you intend to save this query on the database server for later execution, one way to achieve this is by using a stored procedure.
+
+- The following CREATE PROCEDURE statement creates a new stored procedure encapsulating the query above:
+
+- Example: Without params
+
+    ```sql
+        delimiter $$
+
+            create procedure customerdetails()
+            begin
+                select 
+                    customerNumber,
+                    customerName,
+                    contactLastName,
+                    phone
+                from customers;
+                
+            end$$
+
+        delimiter ;
+
+        call customerdetails();
+
+#### In Params: In is used to provide input params
+
+- Example: With IN params
+
+    ```sql
+        delimiter &&
+
+        create procedure customerByCity(in in_countryName varchar(40))
+        begin 
+            select * 
+            from customers
+            where country = in_countryName;
+        end&&
+
+        delimiter ;
+
+        call customerByCity('USA');
+
+#### OUT params: 
+- OUT means the parameter is used to return data from the procedure to the caller.
+
+- Unlike IN (which passes data into the procedure), OUT is empty when passed in and filled inside the procedure.
+
+- used when you want to return a single value (one row, one column).
+Example: total count, max value, sum, or a single string.
+
+- Example: 
+
+
+### Update procedure
+- Use `REPLACE` to update the procedure.
+        
+    ```sql
+        DELIMITER &&
+
+        REPLACE PROCEDURE customerByCity(IN in_countryName VARCHAR(40))
+        BEGIN
+            SELECT * 
+            FROM customers
+            WHERE country = in_countryName;
+        END&&
+
+        DELIMITER ;
+
+### Drop procedure
+
+- Step 1: Drop the old procedure
+
+    ```sql 
+        DROP PROCEDURE IF EXISTS customerByCity;
+
+
+
+
+### Advantages of Stored Procedures
+
+#### Performance
+
+- Stored procedures are precompiled and cached on the server — they run faster than sending multiple SQL queries from the application.
+
+1. Reusability
+    - You can call the same logic again and again from different applications or programs.
+
+2. Security
+    - You can give users permission to execute a procedure without giving them direct access to the underlying tables.
+
+3. Maintainability
+    - Business logic stays in one place (inside the database), making it easier to update or fix.
+
+4. Reduced Network Traffic
+    - Only the procedure call is sent to the server, not many separate SQL statements — saves bandwidth.
+
+#### Disadvantages of Stored Procedures
+
+1. Harder to Debug
+    - Debugging inside SQL (especially in MySQL) can be tricky compared to application code.
+
+2. Less Portable
+    - Stored procedures are database-specific (e.g., MySQL syntax may not work in PostgreSQL or SQL Server).
+
+3. Maintenance Overhead
+    - Managing and version-controlling stored procedures can be harder than managing code files.
+
+4. Limited Business Logic
+    - Complex logic is usually easier to handle in programming languages (like Python, Java) than inside SQL.
+
+5. Potential Performance Bottlenecks
+    - If overused, heavy stored procedures can overload the database server.
 
