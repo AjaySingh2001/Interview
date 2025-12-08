@@ -144,175 +144,230 @@ df.count()
 
 
 
-## Column methods
+# READ CSV
 
-1. Selection & Access
+```python
+    df = spark.read \
+        .option("header", "true") \
+        .option("inferSchema", "true") \
+        .csv("data.csv")
+```
 
-    1. df["colname"]
-        - What it does: Returns a Column object representing that column.
-        - Type: Column
-        - Usage: For transformations, filters, or expressions, not to display data directly.
+- header="true" → first row is column names
+- inferSchema="true" → automatically detect data types
+- csv("data.csv") → load the CSV file
 
-        ```python 
-            Column<'Name'>
+## ROWS
 
-    2. df.select("colname")
-        - What it does: Returns a DataFrame with only the specified column(s).
-        - Type: DataFrame
-        - Usage: When you want to view or work with a subset of columns.
+1. Filtering Rows
+
+    ```python
+        #EXAMPLE: 1
+        df.filter(df['age'] > 25)
+        df.where(df['name'] == 'Ajay')
+
+        df = df.filter((df["Item_Weight"]>10) & (df["Item_Weight"]<13))
+
+
+        #EXAMPLE: 2
+        df = df.where((df["Item_Weight"]>10) & (df["Item_Weight"]<12))
+        df.show()
+    ```
+
+2. Selecting Rows
+
+    - limit(n) → Take the first n rows.
+    - head(n) or take(n) → Returns the first n rows as a list.
+    - first() - Return first row
+
+    ```python
+        df.limit(5)
+        df.head(5)
+        df.take(5)
+        df.first()
+    ```
+
+3. Dropping Rows
+
+    - drop() → Drop a column, not a row.
+    - To remove rows with nulls:
+        ```python
+            df.dropna()                 # drop all rows with any null value
+            df.dropna(subset=['age'])   # drop rows where 'age' is null
+        ```
+    
+    - To remove duplicates:
 
         ```python
-            output: DataFrame[Age: bigint]
+            df.dropDuplicates()              # drop exact duplicate rows
+            df.dropDuplicates(['name'])      # drop duplicate rows based on 'name'
+        ```
 
-    3. col("colname") from pyspark.sql.functions
-        - What it does: Returns a Column object.
-        - Type: Column
-        - Usage: Useful in expressions, select, withColumn, or when column name is a string variable.
+4. Adding / Transforming Rows
+
+    - withColumn() → Add or modify a column (row-level operation):
 
         ```python
-            output: DataFrame[Name: string]
+            from pyspark.sql.functions import col
+            df.withColumn('age_plus_10', col('age') + 10)
+        ```
 
+    - replace() = Replace specific values in column
 
-2. Add or modify column
+        ```python
+            df.replace(old_value, new_value, column_name)
+        ```
 
-> Note: Spark never changes the original DataFrame.
+5. Sampling Rows
 
-1. withColumn: Use withColumn() (the PySpark way to add or modify a column):
+    - sample(fraction, seed=None) → Randomly sample rows.
+        
+        ```python
+            f = df.sample(fraction=0.1)
+            f.first()
+        ```
 
-# Read csv
+6. Sorting Rows
 
-- spark.read.format('csv').option('inferSchema', True).load("BigMartSales.csv")
+    - orderBy(colname, ascending=True/False) → Sort rows.
+        ```python
+            df.orderBy('age', ascending=False)
+        ```
 
-1. spark.read
-    - Starts the DataFrameReader.
-    - Used to read data from different sources — CSV, JSON, Parquet, etc.
+7. Limit / Skip Rows
 
-2. .format('csv')
-    - Specifies the file format to read.
-    - You could replace 'csv' with 'json', 'parquet', 'orc', etc.
+    - limit(n) → Keep top n rows.
+    - subtract() → Remove rows present in another DataFrame:
 
-3. .option('inferSchema', True)
+        ```python
+            df1.subtract(df2)
+        ```
 
-    - Tells Spark to automatically detect the data type of each column.
-        Example:
-        - "25" → integer
-        - "Ajay" → string
-    - If not used, Spark treats all columns as strings by default.
+8. Union / Append Rows
 
-4. .load("BigMartSales.csv")
-    - Loads the file from the given path into a DataFrame.
-    - Spark reads the file in parallel across multiple cores.
+    - union() → Combine two DataFrames with the same schema.
+    - df.unionByName(df2)- Match columns by name not the position.
 
+        ```python
+            df.union(df2)
+            df.unionByName(df2)
+        ```
 
-# Read JSON
+    
+## Columns
 
-spark.read.format("json").load("path to file")
+1. Selecting Columns
 
-.option("multiline", True): Allow us to devine the data format inside the json. default: multiline= False
+    - select(*cols) → Pick specific columns.
 
+        ```python
+            df.select('name', 'age')
+        ```
+    
+    - selectExpr(*exprs) → Use expressions while selecting, It’s like SQL
 
+        ```python
+            df.selectExpr("age + 10 as age_plus_10", "name")
+        ```
 
+2. Adding / Modifying Columns
 
+    - withColumn(colName, expression) → Add new column or modify existing.
 
-## Access Column
+        ```python
+            df.withColumn('age_plus_10', df['age'] + 10)
+        ```
+    
+    - withColumnRenamed(existing, new) → Rename column.
 
-1. Accessing Columns
+        ```python
+            df.withColumnRenamed('age', 'years')
+        ```
+
+3. Dropping Columns
+
+    - drop(*cols) → Remove one or more columns.
+
+        ```python
+            df.drop('age', 'salary')
+        ```
+
+4. Transforming Column Values
+
+    - cast() → Change data type.
+
+        ```python
+            from pyspark.sql.types import IntegerType
+            df.withColumn('age', df['age'].cast(IntegerType()))
+        ```
+
+5. Aggregations (Column-wise)
+
+    - Built-in functions: sum(), avg(), min(), max(), count().
 
     ```python
-    df.select("name").show()
+        from pyspark.sql.functions import sum, avg
+        df.groupBy('department').agg(sum('salary'), avg('age'))
     ```
 
-2. Access multiple columns
+6. Renaming Columns in Bulk
+
+    - toDF(*new_names) → Rename all columns at once.
+
+        ```python
+            df.toDF('name_new', 'age_new', 'salary_new')
+        ```
+
+7. Working with Expressions / SQL functions
+
+    - Use expr() to apply SQL-like expressions.
 
     ```python
-    df.select("name", "age").show()
+        from pyspark.sql.functions import expr
+        df.select(expr("age + 10 as age_plus_10"), expr("upper(name)"))
     ```
 
-3. Column object (for expressions)
+8. Array / Map Columns
+
+    - explode() → Turn array/map into multiple rows.
+    - split() → Split string column into array.
 
     ```python
-    from pyspark.sql.functions import col, upper
-
-    df.select(upper(col("name")), col("age")+100)
+        from pyspark.sql.functions import split, explode
+        df.withColumn('hobby_array', split(df['hobbies'], ','))
+        df.select(explode(df['hobby_array']))
     ```
 
-## Access Rows
+9. Conditional Columns
 
-1. Show first N rows
-
-    ```python
-    df.show(5)
-
-2. Take first N rows as list
+    - when() / otherwise() → Add column conditionally.
 
     ```python
-    df.take(3)  # returns list of Row objects
+        from pyspark.sql.functions import when
+        df.withColumn('adult', when(df['age'] >= 18, 1).otherwise(0))
+    ```
 
 
-3. Collect all rows (be careful for large DF!)
+# Window Functions (Core Concept)
 
-    ```python
-    df.collect()  # returns list of Row objects
+- A window function performs calculations across a group of rows without collapsing them into one row (unlike GROUP BY).
 
-4. first row
-
-    ```python
-    df.first()
-
-5. filter rows
+- To use them You must define a Window:
 
     ```python
-    df.filter(df.age > 10).show()
+        from pyspark.sql.window import Window
 
+        df_partition = Window.partitionBy("department").orderBy("salary")
+    ```
 
-    # or we can use
-
-    df.where(col("age")>10).show()
-
-
-## Adding/Manipulating Columns
-
-1. Add new column
-
+1. ROW_NUMBER(): Gives unique sequence number inside each partition.
 
     ```python
-    df.withColumn("age_plus+5", col("age")+5).show()
+        df.withColumn(
+            "row_num",
+            row_number().over(w)
+        )
+    ```
 
+> Note: If two employees have same salary → they still get different row numbers.
 
-- What it does:
-
-    - df → your original DataFrame (like a table).
-
-    - .withColumn("age_plus_5", ...) → creates a new column in the DataFrame.
-
-    - "age_plus_5" → name of the new column.
-
-    - col("age") + 5 → calculation for the new column: take the existing column age and add 5 to it.
-
->Important: PySpark DataFrames are immutable, which means the original df does NOT change. You always create a new DataFrame when you transform it.
-
-2. Rename Column
-
-    ```python
-    df3 = df2.withColumnRenamed("age_plus+5", "5_added")
-
-3. Drop column
-
-    ```python
-    df4 = df3.drop("5_added")
-
-
-4. Modify column
-
-    ```python
-    df2 = df2.withColumn("age", col("age") + 1)
-
-
-## Access column values (like Pandas)
-
-
-df.select("column").collect()[0][0]
-
-## Selecting distinct / unique values
-
-df.select("name").distinct().show()

@@ -1379,3 +1379,73 @@
 | `book`                          | Returns the underlying workbook object (for engine-specific use, e.g., `openpyxl`). | `emp_data.book`            |
 | `io`                            | Returns the path or buffer of the Excel file that was read.                         | `emp_data.io`              |
 | `engine`                        | Shows which engine is used to read the file (`openpyxl`, `xlrd`, etc.).             | `emp_data.engine`          |
+
+
+## What is pivot in Pandas?
+
+- pivot() reshapes a DataFrame by turning unique values in a column into new columns.
+- It requires:
+    - One index column
+    - One column for new headers
+    - One column for values
+
+- Example:
+
+```python
+    df.pivot(index="Name", columns="Year", values="Sales")
+
+    import pandas as pd
+
+    data = {
+        "Name": ["Alice", "Alice", "Bob", "Bob"],
+        "Year": [2023, 2024, 2023, 2024],
+        "Sales": [500, 600, 700, 800]
+    }
+
+    df = pd.DataFrame(data)
+    print(df)
+
+    | Name  | Year | Sales |
+    | ----- | ---- | ----- |
+    | Alice | 2023 | 500   |
+    | Alice | 2024 | 600   |
+    | Bob   | 2023 | 700   |
+    | Bob   | 2024 | 800   |
+
+
+    pivot_df = df.pivot(index="Name", columns="Year", values="Sales")
+    print(pivot_df)
+
+    | Name  | 2023 | 2024 |
+    | ----- | ---- | ---- |
+    | Alice | 500  | 600  |
+    | Bob   | 700  | 800  |
+
+```
+
+- Rules:
+
+    - The combination of index + columns must be unique
+    - Otherwise → Error (ValueError: Duplicate entries...)
+
+
+## What is pivot_table?
+
+- pivot_table():
+
+    - Reshapes your data (like pivot)
+    - Allows duplicates
+    - Does aggregation (sum, mean, count, etc.)
+    - Works exactly like Excel Pivot Table
+
+
+### Pivot Table – Rules You Must Follow
+- Rule 1: index, columns, and values define the shape
+    - index → rows
+    - columns → column groups
+    - values → the actual data to aggregate
+
+- Rule 2: Aggregation is ALWAYS required
+    - pivot_table must aggregate because real-world data has duplicates.
+    - If duplicates exist → it groups them
+    - You must specify aggfunc
