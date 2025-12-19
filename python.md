@@ -1044,38 +1044,83 @@ Copying creates a new object from an existing object. In Python, you can do shal
 
 -------------
 
-# 1. What is async?
+## Asynchronous Programming
 
-- Async in Python is used to write asynchronous code, which allows your program to do other tasks while waiting for I/O operations (like network requests, file reads, or database calls) to complete.
-- Regular (synchronous) Python blocks until a task finishes.
-- Async lets you pause a function at certain points and let other tasks run.
+### STEP 0: What problem are we solving?
 
-| Keyword     | Purpose                                                     |
-| ----------- | ----------------------------------------------------------- |
-| `async def` | Define an **asynchronous function** (coroutine)             |
-| `await`     | Wait for another coroutine to complete **without blocking** |
+#### Normal (synchronous) code
 
-- Exapmle:
-    ```python
-        import asyncio
+```python
+    import time
 
-        async def say_hello():
-            print("Hello")
-            await asyncio.sleep(2)  # non-blocking sleep
-            print("World")
+    time.sleep(3)
+    print("Done")
+```
 
-        async def main():
-            await say_hello()
-            print("Done")
+❌ Problem:
 
-        # Run the event loop
-        asyncio.run(main())
+- Python stops and waits
 
-    OUTPUT:
-        Hello
-        World
-        Done
+- Cannot do anything else meanwhile
 
+> This is blocking code.
+
+### STEP 1: Blocking vs Non-Blocking (VERY IMPORTANT)
+
+#### Blocking: Program waits → nothing else runs
+
+```python
+    time.sleep(3)
+```
+
+#### Non-Blocking: Program starts a task → switches to another task while waiting
+
+```python
+    await asyncio.sleep(3)
+```
+
+💡 Async is useful when:
+
+- Network calls
+- Database queries
+- File I/O
+- API requests
+
+### STEP 2: Your FIRST async program
+
+- async → defines a coroutine
+- await → waits without blocking
+- asyncio.run() → starts event loop
+
+
+
+---------------
+
+## name == "main" 
+1. What is __name__?
+
+- __name__ is a built-in variable in every Python file.
+
+- Its value depends on how the file is executed.
+
+    | Scenario          | Value of `__name__` |
+    | ----------------- | ------------------- |
+    | File run directly | `"__main__"`        |
+    | File imported     | `"module_name"`     |
+
+
+2. Purpose of if __name__ == "__main__":
+
+    - Ensures code runs only when the file is executed directly
+
+    - Prevents execution when the file is imported
+
+    - Syntax
+
+    ```
+        if __name__ == "__main__":
+        main()
+    ```
 
 -------------
 
@@ -1190,6 +1235,14 @@ Copying creates a new object from an existing object. In Python, you can do shal
         print(s)
 
 # Confusing questions
+
+1. ```python
+    a = result = 20!= 20
+    print(a)
+
+    OUTPUT: False
+    ```
+
 1. ```python
     def add_item(item, lst=[]):
         lst.append(item)
